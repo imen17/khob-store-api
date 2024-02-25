@@ -2,44 +2,50 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
-use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
-use Psr\Log\LogLevel;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Requests\AuthenticationRequestDTO;
+use App\Requests\ChangePasswordRequestDTO;
+use App\Service\AuthenticationService;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Log\Logger;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-
 
 class AuthenticationController extends AbstractController
 {
+
+    public function __construct(
+        private readonly AuthenticationService $authenticationService,
+    ) {
+    }
+
     #[Route('/auth/login', methods: ["POST"])]
-    public function login(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, JWTEncoderInterface $JWTEncoder): JsonResponse
+    public function login(#[MapRequestPayload] AuthenticationRequestDTO $authenticationRequestDTO): Response
     {
-        $parameters = json_decode($request->getContent(), true);
-        $email=$parameters["email"];
-        $user = $entityManager->getRepository(User::class)
-            ->findOneBy(['email' => $email]);
+        return $this->authenticationService->authenticate($authenticationRequestDTO);
+    }
 
-        if (!$user) {
-            throw $this->createNotFoundException();
-        }
+    #[Route('/auth/refresh', methods: ["GET"])]
+    public function refreshToken(Request $request): Response
+    {
+        return $this->authenticationService->refresh($request);
+    }
 
-        $isValid = $passwordHasher->isPasswordValid($user, $parameters["password"]);
+    #[Route('/auth/changePassword', methods: ["PATCH"])]
+    public function updatePassword(#[MapRequestPayload] ChangePasswordRequestDTO $changePasswordRequestDTO): Response
+    {
+        return $this->authenticationService->updatePassword($changePasswordRequestDTO);
+    }
 
-        if (!$isValid) {
-            throw new BadCredentialsException();
-        }
+    #[Route('/auth/logout', methods: ["GET"])]
+    public function logout(): Response
+    {
+        return $this->authenticationService->logout();
+    }
 
-        $token = $JWTEncoder->encode([
-            'username' => $user->getEmail(),
-            'exp' => time() + 3600 // 1 hour expiration
-        ]);
-
-        return new JsonResponse(['token' => $token]);
+    #[Route('/auth/register', methods: ["POST"])]
+    public function register(#[MapRequestPayload] AuthenticationRequestDTO $authenticationRequestDTO): Response
+    {
+        return $this->authenticationService->createUser($authenticationRequestDTO);
     }
 }
