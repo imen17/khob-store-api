@@ -3,6 +3,12 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -10,6 +16,12 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[ApiResource]
+#[Get(security: "is_granted('ROLE_USER')")]
+#[GetCollection(security: "is_granted('ROLE_USER')")]
+#[Post(security: "is_granted('ROLE_ADMIN')")]
+#[Put(security: "is_granted('ROLE_ADMIN')")]
+#[Patch(security: "is_granted('ROLE_ADMIN')")]
+#[Delete(security: "is_granted('ROLE_ADMIN')")]
 class Product
 {
     #[ORM\Id]
@@ -27,7 +39,7 @@ class Product
     private ?int $price = null;
 
     #[ORM\Column]
-    private ?bool $isActive = null;
+    private bool $isActive = true;
 
     #[ORM\OneToMany(targetEntity: ProductVariant::class, mappedBy: 'product', orphanRemoval: true)]
     private Collection $productVariants;
@@ -169,4 +181,5 @@ class Product
 
         return $this;
     }
+
 }

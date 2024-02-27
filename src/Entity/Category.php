@@ -20,20 +20,17 @@ class Category
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'subCategories')]
-    private ?self $parentCategory = null;
-
-    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parentCategory')]
-    private Collection $subCategories;
+    #[ORM\OneToOne(targetEntity: self::class, inversedBy: 'parent_category', cascade: ['persist', 'remove'])]
+    private ?self $parent = null;
 
     #[ORM\OneToMany(targetEntity: Product::class, mappedBy: 'category')]
     private Collection $products;
 
     public function __construct()
     {
-        $this->subCategories = new ArrayCollection();
         $this->products = new ArrayCollection();
     }
+
 
     public function getId(): ?int
     {
@@ -52,44 +49,14 @@ class Category
         return $this;
     }
 
-    public function getParentCategory(): ?self
+    public function getParent(): ?self
     {
-        return $this->parentCategory;
+        return $this->parent;
     }
 
-    public function setParentCategory(?self $parentCategory): static
+    public function setParent(?self $parent): static
     {
-        $this->parentCategory = $parentCategory;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, self>
-     */
-    public function getSubCategories(): Collection
-    {
-        return $this->subCategories;
-    }
-
-    public function addSubCategory(self $subCategory): static
-    {
-        if (!$this->subCategories->contains($subCategory)) {
-            $this->subCategories->add($subCategory);
-            $subCategory->setParentCategory($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSubCategory(self $subCategory): static
-    {
-        if ($this->subCategories->removeElement($subCategory)) {
-            // set the owning side to null (unless already changed)
-            if ($subCategory->getParentCategory() === $this) {
-                $subCategory->setParentCategory(null);
-            }
-        }
+        $this->parent = $parent;
 
         return $this;
     }
@@ -123,4 +90,5 @@ class Category
 
         return $this;
     }
+
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Requests;
+namespace App\DTO;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -12,8 +12,10 @@ class AuthenticationRequestDTO
         #[Assert\Email]
         public readonly string $email,
 
+        #[Assert\Type('string')]
         #[Assert\NotBlank]
-        public readonly string $password)
+        public readonly string $password,
+    )
     {
 
     }

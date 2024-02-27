@@ -7,7 +7,7 @@ use App\Repository\AddressRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AddressRepository::class)]
-#[ApiResource]
+#[ApiResource(security: "is_granted('ROLE_ADMIN') or (is_granted('ROLE_USER') and object.owner == user)")]
 class Address
 {
     #[ORM\Id]
@@ -26,7 +26,8 @@ class Address
 
     #[ORM\ManyToOne(inversedBy: 'addresses')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user_id = null;
+    private ?User $owner = null;
+
 
     public function getId(): ?int
     {
@@ -69,15 +70,16 @@ class Address
         return $this;
     }
 
-    public function getUserId(): ?User
+    public function getOwner(): ?User
     {
-        return $this->user_id;
+        return $this->owner;
     }
 
-    public function setUserId(?User $user_id): static
+    public function setOwner(?User $owner): static
     {
-        $this->user_id = $user_id;
+        $this->owner = $owner;
 
         return $this;
     }
+
 }

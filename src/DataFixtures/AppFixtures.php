@@ -20,14 +20,20 @@ class AppFixtures extends Fixture
     {
 
         $adminUser = new User();
-        $adminUser->setEmail("imennaija17@gmail.com");
-        $adminUser->setRoles(["ROLE_ADMIN"]);
-        $adminUser->setPassword($this->hasher->hashPassword($adminUser, 'a'));
+        $adminUser->setEmail("imennaija17@gmail.com")
+            ->setRoles(["ROLE_ADMIN"])
+            ->setFirstName("Imen")
+            ->setLastName("Naija")
+            ->setPhone(0)
+            ->setPassword($this->hasher->hashPassword($adminUser, 'a'));
         $manager->persist($adminUser);
 
         $regularUser = new User();
-        $regularUser->setEmail("amaninaija@gmail.com");
-        $regularUser->setPassword($this->hasher->hashPassword($adminUser, "b"));
+        $regularUser->setEmail("amaninaija@gmail.com")
+            ->setFirstName("Amani")
+            ->setLastName("Naija")
+            ->setPhone(1)
+            ->setPassword($this->hasher->hashPassword($adminUser, "b"));
         $manager->persist($regularUser);
 
         $manager->flush();

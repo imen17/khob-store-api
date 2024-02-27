@@ -3,8 +3,8 @@
 namespace App\Service;
 
 use App\Entity\User;
-use App\Requests\AuthenticationRequestDTO;
-use App\Requests\ChangePasswordRequestDTO;
+use App\DTO\AuthenticationRequestDTO;
+use App\DTO\ChangePasswordRequestDTO;
 use DateTimeInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Exception\JWTDecodeFailureException;
@@ -102,18 +102,18 @@ class AuthenticationService
 
     public function updatePassword(ChangePasswordRequestDTO $changePasswordRequestDTO): Response
     {
-        $exits = $this->userService->exists($changePasswordRequestDTO->email);
-        if (!$exits) throw new ConflictHttpException("User already exists");
+        $user = $this->userService->getByUsername($changePasswordRequestDTO->email);
+        $isValid = $this->passwordHasher->isPasswordValid($user, $changePasswordRequestDTO->oldPassword);
+        if (!$isValid) throw new BadCredentialsException("Wrong password.");
+        $newPassword = $this->passwordHasher->hashPassword($user, $changePasswordRequestDTO->newPassword);
+        if ($newPassword == $user->getPassword()) throw new BadCredentialsException("The new password cannot be the same as the old password.");
 
-        $user = new User();
-        $user->setEmail($request->email)
-            ->setPassword($this->passwordHasher->hashPassword($user, $request->password));
-
+        $user->setPassword($newPassword);
         $this->userService->save($user);
 
         return new Response(
             null,
-            Response::HTTP_CREATED,
+            Response::HTTP_OK,
         );
     }
 

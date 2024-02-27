@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Requests\AuthenticationRequestDTO;
-use App\Requests\ChangePasswordRequestDTO;
+use App\DTO\AuthenticationRequestDTO;
+use App\DTO\ChangePasswordRequestDTO;
 use App\Service\AuthenticationService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,11 +19,11 @@ class AuthenticationController extends AbstractController
     ) {
     }
 
-    #[Route('/auth/login', methods: ["POST"])]
+/*    #[Route('/auth/login', methods: ["POST"])]
     public function login(#[MapRequestPayload] AuthenticationRequestDTO $authenticationRequestDTO): Response
     {
         return $this->authenticationService->authenticate($authenticationRequestDTO);
-    }
+    }*/
 
     #[Route('/auth/refresh', methods: ["GET"])]
     public function refreshToken(Request $request): Response

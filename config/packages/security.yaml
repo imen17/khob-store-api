@@ -20,6 +20,13 @@ security:
             stateless: true
             provider: users
             jwt: ~
+        main:
+            json_login:
+                check_path: '/auth/login' # The name in routes.yaml is enough for mapping
+                username_path: email
+                password_path: password
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -33,7 +40,7 @@ security:
         - { path: ^/$, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
         - { path: ^/api/docs, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI docs
         - { path: ^/auth, roles: PUBLIC_ACCESS }
-        - { path: ^/, roles: PUBLIC_ACCES }
+        - { path: ^/, roles: PUBLIC_ACCESS  }
 
 when@test:
     security:
