@@ -15,11 +15,11 @@ class CategoryController extends AbstractController
     public function __construct(
         private readonly CategoryService $categoryService){
     }
-    #[Route('/category', name: 'category_list',methods: ["GET"])]
+    #[Route('/category',methods: ["GET"])]
     public function categoryList(){
         return $this->categoryService->getAllCategories();
     }
-    #[Route('/addCategory', name: 'addCategory',methods: ["POST"])]
+    #[Route('/addCategory',methods: ["POST"])]
     public function addCategory(Request $request): JsonResponse {
             $requestData = json_decode($request->getContent(), true);
 
@@ -45,7 +45,7 @@ class CategoryController extends AbstractController
             }
         }
 
-    #[Route('/deleteCategory/{id}', name: 'deleteCategory',methods: ["DELETE"])]
+    #[Route('/deleteCategory/{id}',methods: ["DELETE"])]
     public function deleteCategory(int $id): JsonResponse
     {
         try {
@@ -55,7 +55,7 @@ class CategoryController extends AbstractController
             return new JsonResponse(['error' => 'Failed to delete category: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    #[Route('/Category/{id}', name: 'category',methods: ["GET"])]
+    #[Route('/Category/{id}',methods: ["GET"])]
     public function getCategory(int $id): JsonResponse
     {
         $category = $this->categoryService->getById($id);

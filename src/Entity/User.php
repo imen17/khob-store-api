@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -12,11 +11,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-#[ApiResource]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
     private ?int $id = null;
 
@@ -35,12 +33,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\OneToMany(targetEntity: Cart::class, mappedBy: 'user_id', orphanRemoval: true)]
-    private Collection $carts;
-
-    #[ORM\OneToMany(targetEntity: Favourite::class, mappedBy: 'user_id', orphanRemoval: true)]
-    private Collection $favourites;
-
 
     #[ORM\Column(length: 255)]
     private ?string $firstName = null;
@@ -49,16 +41,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $lastName = null;
 
     #[ORM\Column]
+    #[Assert\Type("int")]
     private ?int $phone = null;
 
     #[ORM\OneToMany(targetEntity: Address::class, mappedBy: 'owner', orphanRemoval: true)]
     private Collection $addresses;
 
+    #[ORM\OneToMany(targetEntity: Cart::class, mappedBy: 'owner')]
+    private Collection $carts;
+
+    #[ORM\OneToMany(targetEntity: Favourite::class, mappedBy: 'owner', orphanRemoval: true)]
+    private Collection $favourites;
+
     public function __construct()
     {
+        $this->addresses = new ArrayCollection();
         $this->carts = new ArrayCollection();
         $this->favourites = new ArrayCollection();
-        $this->addresses = new ArrayCollection();
 
     }
 
@@ -137,66 +136,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    /**
-     * @return Collection<int, Cart>
-     */
-    public function getCarts(): Collection
-    {
-        return $this->carts;
-    }
-
-    public function addCart(Cart $cart): static
-    {
-        if (!$this->carts->contains($cart)) {
-            $this->carts->add($cart);
-            $cart->setUserId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCart(Cart $cart): static
-    {
-        if ($this->carts->removeElement($cart)) {
-            // set the owning side to null (unless already changed)
-            if ($cart->getUserId() === $this) {
-                $cart->setUserId(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Favourite>
-     */
-    public function getFavourites(): Collection
-    {
-        return $this->favourites;
-    }
-
-    public function addFavourite(Favourite $favourite): static
-    {
-        if (!$this->favourites->contains($favourite)) {
-            $this->favourites->add($favourite);
-            $favourite->setUserId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFavourite(Favourite $favourite): static
-    {
-        if ($this->favourites->removeElement($favourite)) {
-            // set the owning side to null (unless already changed)
-            if ($favourite->getUserId() === $this) {
-                $favourite->setUserId(null);
-            }
-        }
-
-        return $this;
-    }
-
 
     public function getFirstName(): ?string
     {
@@ -258,6 +197,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($address->getOwner() === $this) {
                 $address->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Cart>
+     */
+    public function getCarts(): Collection
+    {
+        return $this->carts;
+    }
+
+    public function addCart(Cart $cart): static
+    {
+        if (!$this->carts->contains($cart)) {
+            $this->carts->add($cart);
+            $cart->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCart(Cart $cart): static
+    {
+        if ($this->carts->removeElement($cart)) {
+            // set the owning side to null (unless already changed)
+            if ($cart->getOwner() === $this) {
+                $cart->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Favourite>
+     */
+    public function getFavourites(): Collection
+    {
+        return $this->favourites;
+    }
+
+    public function addFavourite(Favourite $favourite): static
+    {
+        if (!$this->favourites->contains($favourite)) {
+            $this->favourites->add($favourite);
+            $favourite->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFavourite(Favourite $favourite): static
+    {
+        if ($this->favourites->removeElement($favourite)) {
+            // set the owning side to null (unless already changed)
+            if ($favourite->getOwner() === $this) {
+                $favourite->setOwner(null);
             }
         }
 

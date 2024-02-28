@@ -16,14 +16,15 @@ class AuthenticationController extends AbstractController
 
     public function __construct(
         private readonly AuthenticationService $authenticationService,
-    ) {
+    )
+    {
     }
 
-/*    #[Route('/auth/login', methods: ["POST"])]
+    #[Route('/auth/login', methods: ["POST"])]
     public function login(#[MapRequestPayload] AuthenticationRequestDTO $authenticationRequestDTO): Response
     {
-        return $this->authenticationService->authenticate($authenticationRequestDTO);
-    }*/
+        return $this->authenticationService->login($authenticationRequestDTO);
+    }
 
     #[Route('/auth/refresh', methods: ["GET"])]
     public function refreshToken(Request $request): Response

@@ -2,12 +2,10 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Repository\AddressRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AddressRepository::class)]
-#[ApiResource(security: "is_granted('ROLE_ADMIN') or (is_granted('ROLE_USER') and object.owner == user)")]
 class Address
 {
     #[ORM\Id]
@@ -19,7 +17,7 @@ class Address
     private ?string $addressLine = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $City = null;
+    private ?string $city = null;
 
     #[ORM\Column(length: 255)]
     private ?string $governorate = null;
@@ -48,12 +46,12 @@ class Address
 
     public function getCity(): ?string
     {
-        return $this->City;
+        return $this->city;
     }
 
-    public function setCity(string $City): static
+    public function setCity(string $city): static
     {
-        $this->City = $City;
+        $this->city = $city;
 
         return $this;
     }

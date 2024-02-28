@@ -15,19 +15,23 @@ class UserService
     public function __construct(
         private readonly UserRepository         $userRepository,
         private readonly EntityManagerInterface $entityManager,
-        private readonly Security               $security
+        private readonly Security               $security,
     )
     {
     }
 
-    public function getLoggedInUser(): GetMeResponseDTO
+    public function findById(int $id): User
     {
-        $userInterface = $this->security->getUser();
-        if (!$userInterface) throw new UnauthorizedHttpException("You must be logged in");
-        $user = $this->getByUsername($userInterface->getUserIdentifier());
-        return new GetMeResponseDTO($user->getFirstName(),
-            $user->getLastName(),
-            $user->getRoles());
+        $user = $this->userRepository->find($id);
+        if (!$user) throw new UserNotFoundException("User not found");
+        return $user;
+    }
+
+    public function getLoggedInUser(): User
+    {
+        $user = $this->security->getUser();
+        if (!$user) throw new UnauthorizedHttpException("You must be logged in");
+        return $this->getByUsername($user->getUserIdentifier());
     }
 
     public function getByUsername(string $username): User

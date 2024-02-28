@@ -2,12 +2,10 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Repository\FavouriteRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FavouriteRepository::class)]
-#[ApiResource]
 class Favourite
 {
     #[ORM\Id]
@@ -21,7 +19,7 @@ class Favourite
 
     #[ORM\ManyToOne(inversedBy: 'favourites')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user_id = null;
+    private ?User $owner = null;
 
     public function getId(): ?int
     {
@@ -40,15 +38,16 @@ class Favourite
         return $this;
     }
 
-    public function getUserId(): ?User
+    public function getOwner(): ?User
     {
-        return $this->user_id;
+        return $this->owner;
     }
 
-    public function setUserId(?User $user_id): static
+    public function setOwner(?User $owner): static
     {
-        $this->user_id = $user_id;
+        $this->owner = $owner;
 
         return $this;
     }
+
 }

@@ -2,14 +2,12 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
-#[ApiResource]
 class Category
 {
     #[ORM\Id]
@@ -20,7 +18,7 @@ class Category
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\OneToOne(targetEntity: self::class, inversedBy: 'parent_category', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: self::class, cascade: ['remove'], inversedBy: 'parent_category')]
     private ?self $parent = null;
 
     #[ORM\OneToMany(targetEntity: Product::class, mappedBy: 'category')]
