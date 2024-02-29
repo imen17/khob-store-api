@@ -44,6 +44,7 @@ class CartController extends AbstractController
             $product =  $variant->getProduct();
             $photo = $product->getPhotos()->first();
             if (!$photo) $photo = null;
+            else $photo = $photo->getUrl();
             return [
                 "name"=> $product->getName(),
                 "productId"  =>$product->getId(),

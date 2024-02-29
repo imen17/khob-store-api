@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Product;
+use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -17,6 +18,7 @@ class ProductController extends AddressController
 {
     public function __construct(
         private readonly ProductRepository   $productRepository,
+        private readonly CategoryRepository   $categoryRepository,
         private readonly SerializerInterface $serializer,
 
     )
@@ -44,7 +46,7 @@ class ProductController extends AddressController
     }
 
     #[Route('/products', methods: ["GET"])]
-    public function addToFavourites(
+    public function queryProducts(
         #[MapQueryParameter] string                                                                                         $q = null,
         #[MapQueryParameter(filter: \FILTER_VALIDATE_INT)] int                                                              $page = 1,
         #[MapQueryParameter(filter: \FILTER_VALIDATE_INT)] int                                                              $size = 10,
@@ -104,11 +106,24 @@ class ProductController extends AddressController
                 ]
                 ]));
         }
+        $categoriesArr = $this->categoryRepository->findAll();
+        $categories = [];
+        foreach ($categoriesArr as $category) {
+            $parent =$category->getParent();
+            $parentId=null;
+            if (!is_null($parent)) $parentId=$parent->getId();
+            $categories[] = [
+                "id"=>$category->getId(),
+                "name"=> $category->getName(),
+                "parentId"=> $parentId
+            ];
+        }
         $result = [
             "count" => $totalItems,
             "pages" => $pagesCount,
             "currentPage" => $page,
-            "items" => $results
+            "items" => $results,
+            "categories"=> $categories,
         ];
         return new JsonResponse($result, Response::HTTP_OK);
     }

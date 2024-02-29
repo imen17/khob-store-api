@@ -19,7 +19,6 @@ class CartItemController extends AddressController
 {
     public function __construct(
         private readonly UserService         $userService,
-        private readonly SerializerInterface $serializer,
         private readonly CartService         $cartService,
         private readonly ProductVariantRepository         $productVariantRepository,
         private readonly EntityManagerInterface $entityManager
