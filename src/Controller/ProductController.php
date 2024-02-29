@@ -108,6 +108,7 @@ class ProductController extends AddressController
         }
         $categoriesArr = $this->categoryRepository->findAll();
         $categories = [];
+
         foreach ($categoriesArr as $category) {
             $parent =$category->getParent();
             $parentId=null;
